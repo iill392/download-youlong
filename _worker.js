@@ -1,18 +1,18 @@
 export default {
   async fetch(request) {
     const url = new URL(request.url);
-    if (url.pathname === "/download") {
-      return Response.redirect(
-        "https://github.com/iill392/download-youlong/releases/download/111/yltool-V5.02.apk",
-        302
-      );
+    // 访问 /yltool.apk 就反代到 GitHub Release
+    if (url.pathname === "/yltool.apk") {
+      const target = "https://github.com/iill392/download-youlong/releases/download/111/yltool-V5.02.apk";
+      const res = await fetch(target);
+      // 强制下载、文件名正确
+      return new Response(res.body, {
+        headers: {
+          "Content-Disposition": 'attachment; filename="yltool-V5.02.apk"',
+          "Content-Type": "application/vnd.android.package-archive"
+        }
+      });
     }
-    return new Response(`
-      <html>
-        <body style="text-align:center;margin-top:50px;">
-          <a href="/download" style="font-size:20px;padding:10px 20px;background:#007bff;color:white;text-decoration:none;border-radius:5px;">立即下载</a>
-        </body>
-      </html>
-    `, { headers: { "Content-Type": "text/html" } });
+    return new Response("Not Found", { status: 404 });
   }
 };
